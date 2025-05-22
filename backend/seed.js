@@ -1,7 +1,10 @@
-import { mongoClient } from "./libs/db.js";
+import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+// Initialize MongoDB client directly from env
+const mongoClient = new MongoClient(process.env.MONGO_URL);
 
 const courses = [
   {

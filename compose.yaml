@@ -1,0 +1,77 @@
+name: chai-code-assignment
+
+services:
+    mongo-host:
+        image: mongo
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: nand
+            MONGO_INITDB_ROOT_PASSWORD: secret
+        volumes:
+            - chai-code-vol:/data/db
+        ports:
+            - '27018:27017'
+        networks:
+            - chai-code-net
+    
+    chai-code-redis:
+        image: redis:6.2-alpine
+        restart: always
+        ports:
+            - '6379:6379'
+        command: redis-server --save 20 1 --loglevel warning --requirepass redis_secret
+        volumes: 
+            - cache:/data
+        networks:
+            - chai-code-net
+
+    chai-code-backend:
+        build: ./backend
+        restart: always
+        container_name: chai-backend-container
+        ports:
+            - '8080:8080'
+        env_file:
+            ./backend/.env
+        volumes:
+            - ./backend:/backend
+        depends_on:
+            - mongo-host
+            - chai-code-redis
+        networks:
+            - chai-code-net
+    
+    chai-code-seeder:
+        build: ./backend
+        container_name: chai-seeder-container
+        profiles: ["seed"]
+        env_file:
+            ./backend/.env
+        volumes:
+            - ./backend:/backend
+        depends_on:
+            - mongo-host
+        networks:
+            - chai-code-net
+        command: node seed.js
+
+    chai-code-frontend:
+        build: ./frontend
+        restart: always
+        container_name: chai-frontend-container
+        ports:
+            - '5173:5173'
+        env_file:
+            - ./frontend/.env
+        volumes:
+            - ./frontend:/frontend
+        depends_on:
+            - chai-code-backend
+        networks:
+            - chai-code-net
+
+volumes:
+    chai-code-vol:
+    cache:
+networks:
+    chai-code-net:

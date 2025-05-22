@@ -17,6 +17,27 @@ Your task is to containerize the application for a "Development" environment usi
 
 The application environment variables are stored in a `.env` file. You can find the `.env.example` file in the respective directory. Copy it to `.env` and fill in the required values.
 
+## How to Run the Containers
+
+To start all the containers and seed the database, run the following command in your project root:
+
+```sh
+docker compose up -d && docker compose --profile seed run --rm chai-code-seeder
+```
+
+This will start all services in detached mode and run the database seeder. After this, your application will be ready for development.
+
+### Note for Connecting to MongoDB from Host Machine
+
+If you want to connect to the MongoDB instance running inside the container from your host machine (e.g., using MongoDB Compass or mongosh), use the following connection string:
+
+```
+mongodb://<username>:<password>@localhost:27018/chaicode?authSource=admin
+
+# Example
+mongodb://dummyuser:secret@localhost:27018/chaicode?authSource=admin
+```
+
 ## Screenshots
 
 ### Home Page
